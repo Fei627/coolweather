@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <include layout="@layout/set_navgation"/>
 
@@ -16,12 +17,12 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
+            android:layout_height="wrap_content">
 
             <include layout="@layout/set_header"/>
             <include layout="@layout/set_list_set"/>
             <include layout="@layout/set_list_extra"/>
+            <include layout="@layout/set_list_info"/>
 
         </LinearLayout>
 
