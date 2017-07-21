@@ -55,6 +55,8 @@ public class WeatherActivity extends AppCompatActivity {
 
     public DrawerLayout drawerLayout;
     private Button navButton;
+    private Button navSetBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +83,18 @@ public class WeatherActivity extends AppCompatActivity {
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navButton = (Button) findViewById(R.id.nav_button);
+        navSetBtn = (Button) findViewById(R.id.nav_setting);
 
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+        navSetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SetActivity.actionStart(WeatherActivity.this);
             }
         });
 
@@ -209,9 +218,6 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
-
-        Intent intent = new Intent(this, AutoUpdateService.class);
-        startService(intent);
     }
 
     /*加载必应每日一图*/

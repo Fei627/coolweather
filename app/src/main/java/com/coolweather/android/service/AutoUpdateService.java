@@ -22,6 +22,9 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class AutoUpdateService extends Service {
+
+    static public int UPDATE_INTERVAL = 8;
+
     public AutoUpdateService() {
 
     }
@@ -37,7 +40,7 @@ public class AutoUpdateService extends Service {
         updateWeather();
         updateBingPic();
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int anHour = 8 * 60 * 60 * 1000;//8个小时的毫秒数
+        int anHour = UPDATE_INTERVAL * 60 * 60 * 1000;//8个小时的毫秒数
         long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
 
         Intent i = new Intent(this, AutoUpdateService.class);
