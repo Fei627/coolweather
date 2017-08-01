@@ -94,7 +94,7 @@ public class WeatherActivity extends AppCompatActivity {
         navSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SetActivity.actionStart(WeatherActivity.this);
+                SetActivity.actionStart(WeatherActivity.this, titleCity.getText().toString());
             }
         });
 

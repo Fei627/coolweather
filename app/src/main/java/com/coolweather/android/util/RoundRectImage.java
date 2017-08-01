@@ -30,7 +30,6 @@ public class RoundRectImage extends android.support.v7.widget.AppCompatImageView
     public RoundRectImage(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         paint = new Paint();
-
     }
 
     /**
