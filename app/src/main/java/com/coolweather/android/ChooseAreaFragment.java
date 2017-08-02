@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,9 +108,14 @@ public class ChooseAreaFragment extends Fragment {
                         activity.swipeRefreshLayout.setRefreshing(true);
                         activity.requestWeather(weatherId);
                     } else if (getActivity() instanceof CityListActivity) {
-                        Intent intent = new Intent();
+                        //获取广播管理器实例
+                        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+                        Intent intent = new Intent(WeatherActivity.UPDATE_COUNTY_BROADCAST_NAME);
                         intent.putExtra("select_county", county_name);
+                        intent.putExtra("weather_id",weatherId);
                         getActivity().setResult(Activity.RESULT_OK, intent);
+                        //发送本地广播
+                        localBroadcastManager.sendBroadcast(intent);
                         getActivity().finish();
                     }
                 }

@@ -1,16 +1,19 @@
 package com.coolweather.android;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,17 +26,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.Forecast;
 import com.coolweather.android.gson.Weather;
-import com.coolweather.android.service.AutoUpdateService;
 import com.coolweather.android.util.HttpUtil;
 import com.coolweather.android.util.Utility;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import java.util.Random;
 
 public class WeatherActivity extends AppCompatActivity {
 
@@ -57,6 +58,20 @@ public class WeatherActivity extends AppCompatActivity {
     private Button navButton;
     private Button navSetBtn;
 
+    private LocalReceiver localReceiver;
+    private LocalBroadcastManager localBroadcastManager;
+    static public String UPDATE_COUNTY_BROADCAST_NAME = "com.coolweather.android.UPDATE_COUNTY_BROADCAST";
+
+    private int[] imageArray = new int[]{
+            R.mipmap.ic_bg_one, R.mipmap.ic_bg_two, R.mipmap.ic_bg_three, R.mipmap.ic_bg_four, R.mipmap.ic_bg_five,
+            R.mipmap.ic_bg_six, R.mipmap.ic_bg_seven, R.mipmap.ic_bg_eight, R.mipmap.ic_bg_nine, R.mipmap.ic_bg_ten
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        localBroadcastManager.unregisterReceiver(localReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +82,19 @@ public class WeatherActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
+        //初始化控件
+        initUI();
+        //用户交互
+        addViewClick();
+        //初始化数据
+        initData();
+        //注册本地广播
+        registerLocalBroadcast();
+    }
+
+    /*初始化各控件*/
+    private void initUI() {
         setContentView(R.layout.activity_weather);
-        //初始化各控件
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
         titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
@@ -84,7 +110,10 @@ public class WeatherActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navButton = (Button) findViewById(R.id.nav_button);
         navSetBtn = (Button) findViewById(R.id.nav_setting);
+    }
 
+    /*用户交互*/
+    private void addViewClick() {
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,6 +131,17 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeColors(Color.BLUE);
 
+        //下拉刷新
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(mWeatherId);
+            }
+        });
+    }
+
+    /*初始化数据*/
+    private void initData() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
         if (weatherString != null) {
@@ -123,14 +163,16 @@ public class WeatherActivity extends AppCompatActivity {
         } else {
             loadBingPic();
         }
+    }
 
-        //下拉刷新
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                requestWeather(mWeatherId);
-            }
-        });
+    /*注册本地广播*/
+    private void registerLocalBroadcast() {
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(UPDATE_COUNTY_BROADCAST_NAME);
+        localReceiver = new LocalReceiver();
+        //注册本地广播监听器
+        localBroadcastManager.registerReceiver(localReceiver, intentFilter);
     }
 
     /*根据天气id 请求城市天气信息*/
@@ -161,7 +203,8 @@ public class WeatherActivity extends AppCompatActivity {
                     }
                 });
 
-                loadBingPic();
+                //loadBingPic();
+                randomImage();
             }
 
             @Override
@@ -245,6 +288,28 @@ public class WeatherActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void randomImage() {
+        Random rand = new Random();
+        final int i = rand.nextInt(10);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bingPicImg.setImageResource(imageArray[i]);
+            }
+        });
+    }
+
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String county_name = intent.getStringExtra("select_county");
+            String weather_id = intent.getStringExtra("weather_id");
+            requestWeather(weather_id);
+            titleCity.setText(county_name);
+        }
     }
 
 }

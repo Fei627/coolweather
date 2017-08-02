@@ -48,12 +48,14 @@ public class SetActivity extends AppCompatActivity implements View.OnClickListen
         initData();
     }
 
+    /*点击事件*/
     @Override
     public void onClick(View view) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 
         switch (view.getId()) {
             case R.id.set_nav_back:
+
                 finish();
                 break;
             case R.id.btn_set_header_voice:
